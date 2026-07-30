@@ -393,20 +393,29 @@
     <!-- Footer -->
     <footer
         class="w-full px-margin py-lg flex flex-col md:flex-row justify-between items-center gap-md bg-surface-container-low/80 backdrop-blur-md border-t border-outline-variant/30">
-        <div class="flex items-center gap-sm">
+        <div class="flex flex-col md:flex-row items-center gap-sm text-center md:text-left">
             <span class="font-label-caps text-label-caps text-primary">NeuroScan AI</span>
-            <span class="font-body-sm text-body-sm text-on-surface-variant">© 2024. Professional Medical Use
-                Only.</span>
+            <span class="font-body-sm text-body-sm text-on-surface-variant hidden md:inline">|</span>
+            <span class="font-body-sm text-body-sm text-on-surface-variant">
+                Developed by <strong>Prajwal Pachbudhe</strong>
+            </span>
         </div>
-        <div class="flex gap-lg">
-            <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors"
-                href="#">Terms of Service</a>
-            <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors"
-                href="#">Privacy Policy</a>
-            <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors"
-                href="#">Medical Disclaimer</a>
-            <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors"
-                href="#">Support</a>
+        <div class="flex flex-wrap justify-center gap-lg">
+            <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1"
+                href="mailto:prajwalpachbudhe@gmail.com">
+                <span class="material-symbols-outlined text-[18px]" data-icon="mail">mail</span>
+                Email
+            </a>
+            <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1"
+                href="https://www.linkedin.com/in/prajwal-pachbudhe-54927928b?" target="_blank">
+                <span class="material-symbols-outlined text-[18px]" data-icon="link">link</span>
+                LinkedIn
+            </a>
+            <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1"
+                href="https://github.com/PrajwalPachbudhe" target="_blank">
+                <span class="material-symbols-outlined text-[18px]" data-icon="code">code</span>
+                GitHub
+            </a>
         </div>
     </footer>
     <script>
