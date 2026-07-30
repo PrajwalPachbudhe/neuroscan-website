@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>NeuroScan AI - MRI Classifier Dashboard</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;family=JetBrains+Mono:wght@100..900&amp;display=swap"
+        rel="stylesheet" />
+    <style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .glass-modal {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(50px);
+            -webkit-backdrop-filter: blur(50px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 0 40px rgba(0, 229, 255, 0.05);
+        }
+
+        .scan-line {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00e5ff, transparent);
+            position: absolute;
+            width: 100%;
+            top: 0;
+            animation: scan 4s linear infinite;
+        }
+
+        @keyframes scan {
+            0% {
+                top: 0%;
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                top: 100%;
+                opacity: 0;
+            }
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .data-glow {
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
+        }
+    </style>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed": "#2c0051",
+                        "surface": "#f8f9ff",
+                        "surface-dim": "#cbdbf5",
+                        "on-secondary-container": "#fffbff",
+                        "inverse-on-surface": "#eaf1ff",
+                        "on-primary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "primary-container": "#00e5ff",
+                        "on-surface-variant": "#3b494c",
+                        "on-tertiary": "#ffffff",
+                        "outline-variant": "#bac9cc",
+                        "error": "#ba1a1a",
+                        "surface-tint": "#006875",
+                        "on-primary-fixed": "#001f24",
+                        "surface-variant": "#d3e4fe",
+                        "primary": "#006875",
+                        "on-tertiary-fixed-variant": "#444749",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed-dim": "#ddb7ff",
+                        "on-primary-container": "#00626e",
+                        "tertiary-fixed": "#e0e3e5",
+                        "secondary-container": "#9c48ea",
+                        "secondary-fixed": "#f0dbff",
+                        "on-primary-fixed-variant": "#004f58",
+                        "inverse-primary": "#00daf3",
+                        "primary-fixed-dim": "#00daf3",
+                        "tertiary": "#5c5f61",
+                        "tertiary-fixed-dim": "#c4c7c9",
+                        "surface-container-high": "#dce9ff",
+                        "surface-container": "#e5eeff",
+                        "background": "#f8f9ff",
+                        "primary-fixed": "#9cf0ff",
+                        "surface-bright": "#f8f9ff",
+                        "inverse-surface": "#213145",
+                        "on-tertiary-container": "#565a5b",
+                        "on-secondary-fixed-variant": "#6900b3",
+                        "on-tertiary-fixed": "#191c1e",
+                        "on-background": "#0b1c30",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-highest": "#d3e4fe",
+                        "error-container": "#ffdad6",
+                        "outline": "#6b7a7d",
+                        "tertiary-container": "#ced1d3",
+                        "surface-container-low": "#eff4ff",
+                        "secondary": "#8127cf",
+                        "on-error": "#ffffff",
+                        "on-surface": "#0b1c30"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin": "48px",
+                        "xs": "4px",
+                        "md": "16px",
+                        "sm": "8px",
+                        "xl": "40px",
+                        "unit": "4px",
+                        "lg": "24px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "label-caps": ["JetBrains Mono"],
+                        "body-lg": ["Inter"],
+                        "data-mono": ["JetBrains Mono"],
+                        "body-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "headline-xl": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "data-mono": ["14px", { "lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-xl": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+
+<body class="bg-background font-body-md text-on-surface min-h-screen overflow-x-hidden">
+    <!-- Animated Shader Background -->
+
+    <!-- Top Navigation Bar -->
+    <nav
+        class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin py-md bg-white/10 backdrop-blur-[30px] border-b border-white/50 shadow-[0_8px_32px_0_rgba(0,104,117,0.1)]">
+        <div class="flex items-center gap-md">
+            <img alt="NeuroScan AI Logo" class="h-10 w-auto"
+                src="https://lh3.googleusercontent.com/aida/AP1WRLsi_HKvQVpcZKjGLZlfSftT1PFEp5RtIO5obqtIyolDCz751ecXuFB6pXvkllkowkPgrxeJ5Vs3cnc_e-aCjOMEL2ABqsMGJ1cqVhf8VLoO5yG91c2FJogjRlaJFgFhRKeotFPXN-GurnL1BhQQ6KrO-KdVlBlv4Rpow-OoabQ8jGiGYZnES0T-avlUBY8EX-iicAaQiuYCULIC52XuLHXaxtcc9gwjS3J61wS0kQuoyPpi36NHm87fj7g" />
+            <span class="font-headline-md text-headline-md font-bold text-primary tracking-tight">NeuroScan AI</span>
+        </div>
+        <div class="hidden md:flex items-center gap-xl">
+            <a class="font-body-md text-body-md text-primary border-b-2 border-primary pb-1 cursor-pointer active:scale-95 transition-transform duration-200"
+                href="#">Scan</a>
+            <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors cursor-pointer active:scale-95 transition-transform duration-200"
+                href="#">Analysis</a>
+            <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors cursor-pointer active:scale-95 transition-transform duration-200"
+                href="#">History</a>
+            <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors cursor-pointer active:scale-95 transition-transform duration-200"
+                href="#">Profile</a>
+        </div>
+        <div class="flex items-center gap-md">
+            <button class="p-2 hover:bg-white/20 rounded-lg transition-all cursor-pointer active:scale-95">
+                <span class="material-symbols-outlined text-primary" data-icon="settings">settings</span>
+            </button>
+            <div class="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center">
+                <span class="material-symbols-outlined text-primary" data-icon="person">person</span>
+            </div>
+        </div>
+    </nav>
+    <!-- Main Content Grid -->
+    <main class="pt-32 pb-12 px-margin relative z-10">
+        <div class="grid grid-cols-12 gap-gutter max-w-[1600px] mx-auto">
+            <!-- Left Column: Upload & Scan Area -->
+            <section class="col-span-12 lg:col-span-4 flex flex-col gap-gutter">
+                <div id="drop-zone"
+                    class="glass-panel p-lg rounded-xl flex flex-col items-center justify-center text-center border-dashed border-2 border-primary/30 min-h-[300px] group hover:border-primary/60 transition-all duration-300">
+                    <div
+                        class="mb-md p-lg bg-primary/5 rounded-full group-hover:scale-110 transition-transform duration-500">
+                        <span class="material-symbols-outlined text-[48px] text-primary"
+                            data-icon="upload_file">upload_file</span>
+                    </div>
+                    <h2 class="font-headline-md text-headline-md text-on-surface mb-sm">Upload &amp; Scan</h2>
+                    <p class="font-body-md text-body-md text-on-surface-variant mb-lg px-md">Drag and drop clinical
+                        DICOM files here for immediate classification.</p>
+                    <input type="file" id="mri-upload" accept="image/*" class="hidden">
+                    <button
+                        class="w-full py-md bg-gradient-to-r from-primary to-primary-container text-white rounded-lg font-bold shadow-lg active:scale-95 transition-all flex items-center justify-center gap-sm"
+                        id="scan-trigger" onclick="document.getElementById('mri-upload').click()">
+                        <span class="material-symbols-outlined" data-icon="biotech">biotech</span>
+                        UPLOAD & SCAN NEURAL TISSUE
+                    </button>
+                </div>
+                <!-- Meta Details Card -->
+                <div class="glass-panel p-lg rounded-xl flex flex-col gap-md">
+                    <div class="flex items-center justify-between">
+                        <span class="font-label-caps text-label-caps text-on-surface-variant">PATIENT ID</span>
+                        <span class="font-data-mono text-data-mono text-primary">#PX-8829-01</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="font-label-caps text-label-caps text-on-surface-variant">MODALITY</span>
+                        <span class="font-data-mono text-data-mono text-primary">MRI AXIAL T2</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="font-label-caps text-label-caps text-on-surface-variant">RESOLUTION</span>
+                        <span class="font-data-mono text-data-mono text-primary">512 x 512 PX</span>
+                    </div>
+                    <div class="mt-md pt-md border-t border-outline-variant/30">
+                        <div class="flex items-center gap-sm mb-sm">
+                            <span class="material-symbols-outlined text-primary text-sm"
+                                data-icon="verified_user">verified_user</span>
+                            <span class="font-label-caps text-label-caps text-primary">FDA COMPLIANT ENGINE</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- Right Column: Viewport & Results -->
+            <section class="col-span-12 lg:col-span-8 grid grid-cols-8 gap-gutter">
+                <!-- Clinical Viewport -->
+                <div class="col-span-8 xl:col-span-5 glass-panel rounded-xl overflow-hidden relative min-h-[500px]">
+                    <div class="absolute inset-0 bg-black/5 pointer-events-none"></div>
+                    <img id="viewport-img" class="w-full h-full object-cover"
+                        data-alt="A highly detailed axial MRI brain scan showing cross-sectional neural structures in a clinical black and white format. Overlaid on top of the image are cyan digital crosshairs, coordinate markers in JetBrains Mono font, and a glowing scanning beam effect. The aesthetic is clean, medical, and high-tech, with a bright white background outside the scan area."
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2p1TEPPw46M8TS64aGMEUUI4sV8AX9SzptDMTaXLTuf1b4uKcGezoSHsyXq-C9gKQ6YhQ1aqb4KHrF716UZhq5FJBf6TLY83P_1D_TivBtoVuljtjhmTANgDctbJov_2kgvfTn8vjNoRZchcfJSwMIorbPEh9R0wFk3K_FbG2CK6ATZdcdSSdYwSl08g5a4La72jiH1JY_F4m3kGXRDfpdG6W8mSpCaW3Lc-b-3-ryGHPOqZNFPd5" />
+                    <!-- Scanner UI Overlay -->
+                    <div class="absolute inset-0 flex flex-col justify-between p-md pointer-events-none">
+                        <div class="flex justify-between items-start">
+                            <div
+                                class="bg-primary/80 backdrop-blur-md px-sm py-xs rounded text-white font-data-mono text-xs uppercase tracking-widest">
+                                Live Viewport</div>
+                            <div class="flex flex-col items-end">
+                                <span class="font-data-mono text-xs text-primary data-glow">X: 124.52</span>
+                                <span class="font-data-mono text-xs text-primary data-glow">Y: 092.11</span>
+                                <span class="font-data-mono text-xs text-primary data-glow">Z: 005.18</span>
+                            </div>
+                        </div>
+                        <div id="scan-line" class="scan-line hidden"></div>
+                        <div class="flex justify-center">
+                            <div class="w-16 h-16 border-2 border-primary-container/50 rounded-full animate-ping"></div>
+                        </div>
+                        <div class="flex justify-between items-end">
+                            <div class="p-sm glass-panel text-[10px] font-data-mono text-primary-container uppercase">
+                                Analysis: Active<br />
+                                Latency: 42ms
+                            </div>
+                            <div
+                                class="p-sm glass-panel text-[10px] font-data-mono text-primary-container uppercase text-right">
+                                Predicted Class<br />
+                                <span id="overall-pred" class="text-lg font-bold">N/A</span><br />
+                                Conf: <span id="overall-conf">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Classification Results -->
+                <div class="col-span-8 xl:col-span-3 flex flex-col gap-gutter">
+                    <div class="glass-modal p-lg rounded-xl h-full flex flex-col gap-md">
+                        <h3 class="font-headline-md text-headline-md text-on-surface flex items-center gap-sm">
+                            <span class="material-symbols-outlined text-secondary"
+                                data-icon="psychology">psychology</span>
+                            Classification
+                        </h3>
+                        <div class="space-y-md mt-sm">
+                            <!-- Pituitary -->
+                            <div class="group cursor-help">
+                                <div class="flex justify-between items-end mb-xs">
+                                    <span class="font-label-caps text-label-caps text-on-surface">PITUITARY</span>
+                                    <span id="conf-Pituitary" class="font-data-mono text-data-mono text-on-surface-variant">0%</span>
+                                </div>
+                                <div class="h-2 w-full bg-surface-container rounded-full overflow-hidden">
+                                    <div id="bar-Pituitary" class="h-full bg-outline-variant/50 transition-all duration-1000 ease-out"
+                                        style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <!-- Glioma -->
+                            <div class="group cursor-help">
+                                <div class="flex justify-between items-end mb-xs">
+                                    <span class="font-label-caps text-label-caps text-on-surface">GLIOMA</span>
+                                    <span id="conf-Glioma" class="font-data-mono text-data-mono text-on-surface-variant">0%</span>
+                                </div>
+                                <div class="h-2 w-full bg-surface-container rounded-full overflow-hidden">
+                                    <div id="bar-Glioma" class="h-full bg-outline-variant/50 transition-all duration-1000 ease-out"
+                                        style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <!-- Meningioma -->
+                            <div class="group cursor-help">
+                                <div class="flex justify-between items-end mb-xs">
+                                    <span class="font-label-caps text-label-caps text-on-surface">MENINGIOMA</span>
+                                    <span id="conf-Meningioma" class="font-data-mono text-data-mono text-on-surface-variant">0%</span>
+                                </div>
+                                <div class="h-2 w-full bg-surface-container rounded-full overflow-hidden">
+                                    <div id="bar-Meningioma" class="h-full bg-outline-variant/50 transition-all duration-1000 ease-out"
+                                        style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <!-- Clear -->
+                            <div class="group cursor-help">
+                                <div class="flex justify-between items-end mb-xs">
+                                    <span class="font-label-caps text-label-caps text-on-surface">NORMAL / CLEAR</span>
+                                    <span id="conf-No Tumor" class="font-data-mono text-data-mono text-on-surface-variant">0%</span>
+                                </div>
+                                <div class="h-2 w-full bg-surface-container rounded-full overflow-hidden">
+                                    <div id="bar-No Tumor" class="h-full bg-outline-variant/50 transition-all duration-1000 ease-out"
+                                        style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-auto pt-md border-t border-outline-variant/30 flex flex-col gap-sm">
+                            <div class="flex items-center gap-xs">
+                                <span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+                                <span class="font-label-caps text-[10px] text-secondary uppercase">Highly Significant
+                                    Finding</span>
+                            </div>
+                            <button
+                                class="w-full py-sm border border-primary/40 text-primary rounded-lg font-label-caps hover:bg-primary/5 transition-colors">
+                                DOWNLOAD RADIOLOGY REPORT
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <!-- Bottom Section: Diagnostic Protocol -->
+        <section class="max-w-[1600px] mx-auto mt-gutter">
+            <div class="glass-panel p-lg rounded-xl">
+                <h4 class="font-label-caps text-label-caps text-on-surface-variant mb-lg text-center tracking-[0.2em]">
+                    DIAGNOSTIC PROTOCOL WORKFLOW</h4>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-xl relative">
+                    <!-- Progress Line (Desktop) -->
+                    <div class="hidden md:block absolute top-6 left-1/4 right-1/4 h-[1px] bg-primary/20 z-0"></div>
+                    <!-- Step 1 -->
+                    <div class="relative z-10 flex flex-col items-center text-center px-md group">
+                        <div
+                            class="w-12 h-12 rounded-full bg-white border border-primary flex items-center justify-center mb-md shadow-lg group-hover:bg-primary group-hover:text-white transition-all duration-300">
+                            <span class="font-data-mono">01</span>
+                        </div>
+                        <h5 class="font-headline-md text-[18px] text-on-surface mb-xs">Data Ingestion</h5>
+                        <p class="font-body-sm text-body-sm text-on-surface-variant">DICOM normalization and voxel
+                            resampling to standard clinical space.</p>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="relative z-10 flex flex-col items-center text-center px-md group">
+                        <div
+                            class="w-12 h-12 rounded-full bg-white border border-primary flex items-center justify-center mb-md shadow-lg group-hover:bg-primary group-hover:text-white transition-all duration-300">
+                            <span class="font-data-mono">02</span>
+                        </div>
+                        <h5 class="font-headline-md text-[18px] text-on-surface mb-xs">Feature Extraction</h5>
+                        <p class="font-body-sm text-body-sm text-on-surface-variant">Multi-modal deep learning
+                            convolution filters detecting subtle textural changes.</p>
+                    </div>
+                    <!-- Step 3 -->
+                    <div class="relative z-10 flex flex-col items-center text-center px-md group">
+                        <div
+                            class="w-12 h-12 rounded-full bg-white border border-primary flex items-center justify-center mb-md shadow-lg group-hover:bg-primary group-hover:text-white transition-all duration-300">
+                            <span class="font-data-mono">03</span>
+                        </div>
+                        <h5 class="font-headline-md text-[18px] text-on-surface mb-xs">Classification</h5>
+                        <p class="font-body-sm text-body-sm text-on-surface-variant">Final probabilistic inference and
+                            heatmapping of identified regions.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <!-- Footer -->
+    <footer
+        class="w-full px-margin py-lg flex flex-col md:flex-row justify-between items-center gap-md bg-surface-container-low/80 backdrop-blur-md border-t border-outline-variant/30">
+        <div class="flex items-center gap-sm">
+            <span class="font-label-caps text-label-caps text-primary">NeuroScan AI</span>
+            <span class="font-body-sm text-body-sm text-on-surface-variant">© 2024. Professional Medical Use
+                Only.</span>
+        </div>
+        <div class="flex gap-lg">
+            <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors"
+                href="#">Terms of Service</a>
+            <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors"
+                href="#">Privacy Policy</a>
+            <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors"
+                href="#">Medical Disclaimer</a>
+            <a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors"
+                href="#">Support</a>
+        </div>
+    </footer>
+    <script>
+        const scanBtn = document.getElementById('scan-trigger');
+        const fileInput = document.getElementById('mri-upload');
+        const viewportImg = document.getElementById('viewport-img');
+        const scanLine = document.getElementById('scan-line');
+
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Preview image
+            viewportImg.src = URL.createObjectURL(file);
+
+            // UI Loading state
+            scanBtn.innerHTML = `
+                <span class="material-symbols-outlined animate-spin" data-icon="refresh">refresh</span>
+                PROCESSING NEURAL DATA...
+            `;
+            scanBtn.classList.replace('from-primary', 'from-secondary');
+            scanLine.classList.remove('hidden');
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Update overall
+                    document.getElementById('overall-pred').textContent = data.prediction;
+                    document.getElementById('overall-conf').textContent = data.confidence.toFixed(1) + '%';
+                    
+                    // Update bars
+                    const classes = ['Pituitary', 'Glioma', 'Meningioma', 'No Tumor'];
+                    classes.forEach(cls => {
+                        const prob = data.probabilities[cls].toFixed(1);
+                        document.getElementById('conf-' + cls).textContent = prob + '%';
+                        document.getElementById('bar-' + cls).style.width = prob + '%';
+                        
+                        const barEl = document.getElementById('bar-' + cls);
+                        const textEl = document.getElementById('conf-' + cls);
+                        if (cls === data.prediction) {
+                            barEl.className = "h-full bg-gradient-to-r from-primary to-primary-container transition-all duration-1000 ease-out";
+                            textEl.className = "font-data-mono text-data-mono text-primary font-bold";
+                        } else {
+                            barEl.className = "h-full bg-outline-variant/50 transition-all duration-1000 ease-out";
+                            textEl.className = "font-data-mono text-data-mono text-on-surface-variant";
+                        }
+                    });
+
+                    scanBtn.innerHTML = `
+                        <span class="material-symbols-outlined" data-icon="check_circle">check_circle</span>
+                        SCAN COMPLETE
+                    `;
+                } else {
+                    alert('Error: ' + data.detail);
+                    scanBtn.innerHTML = `UPLOAD & SCAN NEURAL TISSUE`;
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Failed to connect to backend.');
+                scanBtn.innerHTML = `UPLOAD & SCAN NEURAL TISSUE`;
+            }
+
+            scanBtn.classList.replace('from-secondary', 'from-primary');
+            scanLine.classList.add('hidden');
+        });
+
+        // Drag and Drop functionality
+        const dropZone = document.getElementById('drop-zone');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.add('bg-primary/10'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.remove('bg-primary/10'), false);
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files && files.length > 0) {
+                fileInput.files = files;
+                fileInput.dispatchEvent(new Event('change'));
+            }
+        }, false);
+
+        // Parallax-ish Effect on Glass Panels
+        document.addEventListener('mousemove', (e) => {
+            const panels = document.querySelectorAll('.glass-panel');
+            const x = (window.innerWidth / 2 - e.pageX) / 50;
+            const y = (window.innerHeight / 2 - e.pageY) / 50;
+
+            panels.forEach(panel => {
+                panel.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,16 @@
+# Dependencies for training
+torch
+torchvision
+Pillow
+numpy
+scikit-learn
+
+# Dependencies for evaluation plots
+matplotlib
+seaborn
+
+# Dependencies for web app
+gradio>=4.0
+fastapi
+uvicorn
+python-multipart

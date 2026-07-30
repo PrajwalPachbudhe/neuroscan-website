@@ -1,0 +1,6 @@
+# Hugging Face Spaces deployment dependencies (lighter)
+torch
+torchvision
+gradio>=4.0
+Pillow
+numpy

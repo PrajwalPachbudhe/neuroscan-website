@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI-powered brain tumor detection and classification from MRI images. Upload an MRI scan to detect Glioma, Meningioma, Pituitary tumors using deep learning.">
+    <meta name="keywords" content="brain tumor, MRI, classification, deep learning, neural network, medical AI">
+    <meta name="author" content="NeuroScan AI">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="NeuroScan AI — Brain Tumor MRI Classifier">
+    <meta property="og:description" content="Detect and classify brain tumors from MRI images using AI. Free, private, runs entirely in your browser.">
+    <meta property="og:type" content="website">
+
+    <title>NeuroScan AI — Brain Tumor MRI Classifier</title>
+
+    <!-- TensorFlow.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0/dist/tf.min.js"></script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Favicon (brain emoji as SVG) -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
+</head>
+<body>
+
+    <!-- Background Effects -->
+    <div class="bg-effects" aria-hidden="true">
+        <div class="bg-grid"></div>
+        <div class="bg-orb bg-orb--cyan"></div>
+        <div class="bg-orb bg-orb--purple"></div>
+        <div class="bg-orb bg-orb--pink"></div>
+    </div>
+
+    <!-- App Container -->
+    <div class="app">
+
+        <!-- Header -->
+        <header class="header" id="header">
+            <div class="header__badge">
+                <span class="header__badge-dot"></span>
+                AI-Powered Diagnostics
+            </div>
+
+            <div class="brain-icon" aria-hidden="true">
+                <div class="brain-icon__ring"></div>
+                <div class="brain-icon__ring"></div>
+                <div class="brain-icon__ring"></div>
+                <span class="brain-icon__emoji">🧠</span>
+            </div>
+
+            <h1 class="header__title">
+                <span class="header__title-gradient">NeuroScan AI</span>
+            </h1>
+            <p class="header__subtitle">
+                Upload a brain MRI scan and our neural network will detect and classify tumors in seconds — entirely in your browser.
+            </p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main">
+
+            <!-- Left Column: Upload -->
+            <section class="card" id="upload-section">
+                <h2 class="card__title">
+                    <span class="card__title-icon">📤</span>
+                    Upload MRI Scan
+                </h2>
+
+                <!-- Upload Zone -->
+                <div class="upload-zone" id="upload-zone" role="button" tabindex="0" aria-label="Upload MRI image">
+                    <span class="upload-zone__icon">🔬</span>
+                    <p class="upload-zone__text">
+                        <strong>Drop your MRI image here</strong><br>
+                        or click to browse
+                    </p>
+                    <p class="upload-zone__hint">Supports JPG, PNG, WEBP — Max 10MB</p>
+                    <input type="file" class="upload-zone__input" id="file-input" accept="image/*">
+                </div>
+
+                <!-- Image Preview -->
+                <div class="preview" id="preview">
+                    <div class="preview__image-wrapper">
+                        <img class="preview__image" id="preview-image" alt="Uploaded MRI scan">
+                        <div class="preview__scan-line" id="scan-line"></div>
+                    </div>
+                    <p class="preview__filename" id="preview-filename"></p>
+                    <div class="btn-group">
+                        <button class="btn btn--primary" id="analyze-btn" disabled>
+                            <span id="analyze-btn-text">🔍 Analyze Scan</span>
+                        </button>
+                        <button class="btn btn--secondary" id="reset-btn">
+                            ↩ Reset
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Column: Results -->
+            <section class="card" id="results-section">
+                <h2 class="card__title">
+                    <span class="card__title-icon">📊</span>
+                    Analysis Results
+                </h2>
+
+                <!-- Empty State -->
+                <div id="empty-state" style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+                    <span style="font-size: 3rem; display: block; margin-bottom: 1rem; opacity: 0.5;">🔬</span>
+                    <p style="font-size: 0.9rem;">Upload an MRI scan to see<br>classification results here</p>
+                </div>
+
+                <!-- Results (hidden initially) -->
+                <div class="results" id="results">
+                    <!-- Diagnosis -->
+                    <div class="diagnosis" id="diagnosis">
+                        <p class="diagnosis__label">Classification Result</p>
+                        <h3 class="diagnosis__name" id="diagnosis-name">—</h3>
+                        <p class="diagnosis__confidence">
+                            Confidence: <strong id="diagnosis-confidence">—</strong>
+                        </p>
+                    </div>
+
+                    <!-- Probability Bars -->
+                    <div class="probabilities" id="probabilities">
+                        <div class="prob-bar prob-bar--glioma">
+                            <div class="prob-bar__header">
+                                <span class="prob-bar__label">
+                                    <span class="prob-bar__label-dot"></span>
+                                    Glioma
+                                </span>
+                                <span class="prob-bar__value" id="prob-glioma">0%</span>
+                            </div>
+                            <div class="prob-bar__track">
+                                <div class="prob-bar__fill" id="bar-glioma"></div>
+                            </div>
+                        </div>
+                        <div class="prob-bar prob-bar--meningioma">
+                            <div class="prob-bar__header">
+                                <span class="prob-bar__label">
+                                    <span class="prob-bar__label-dot"></span>
+                                    Meningioma
+                                </span>
+                                <span class="prob-bar__value" id="prob-meningioma">0%</span>
+                            </div>
+                            <div class="prob-bar__track">
+                                <div class="prob-bar__fill" id="bar-meningioma"></div>
+                            </div>
+                        </div>
+                        <div class="prob-bar prob-bar--pituitary">
+                            <div class="prob-bar__header">
+                                <span class="prob-bar__label">
+                                    <span class="prob-bar__label-dot"></span>
+                                    Pituitary
+                                </span>
+                                <span class="prob-bar__value" id="prob-pituitary">0%</span>
+                            </div>
+                            <div class="prob-bar__track">
+                                <div class="prob-bar__fill" id="bar-pituitary"></div>
+                            </div>
+                        </div>
+                        <div class="prob-bar prob-bar--notumor">
+                            <div class="prob-bar__header">
+                                <span class="prob-bar__label">
+                                    <span class="prob-bar__label-dot"></span>
+                                    No Tumor
+                                </span>
+                                <span class="prob-bar__value" id="prob-notumor">0%</span>
+                            </div>
+                            <div class="prob-bar__track">
+                                <div class="prob-bar__fill" id="bar-notumor"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tumor Info (shown after analysis) -->
+                    <div class="info-section" id="info-section" style="display: none;">
+                        <h3 class="info-section__title">
+                            <span>ℹ️</span>
+                            About This Classification
+                        </h3>
+                        <div class="info-grid" id="info-grid"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- How It Works (full width) -->
+            <section class="card full-width" id="how-it-works">
+                <h2 class="card__title">
+                    <span class="card__title-icon">⚡</span>
+                    How It Works
+                </h2>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step__icon">📤</div>
+                        <div class="step__number">1</div>
+                        <h3 class="step__title">Upload</h3>
+                        <p class="step__desc">Drop or select a brain MRI scan image from your device</p>
+                    </div>
+                    <div class="step">
+                        <div class="step__icon">🧠</div>
+                        <div class="step__number">2</div>
+                        <h3 class="step__title">AI Analysis</h3>
+                        <p class="step__desc">Our neural network processes the image using MobileNetV2 deep learning</p>
+                    </div>
+                    <div class="step">
+                        <div class="step__icon">📊</div>
+                        <div class="step__number">3</div>
+                        <h3 class="step__title">Results</h3>
+                        <p class="step__desc">Get instant classification with confidence scores across 4 categories</p>
+                    </div>
+                    <div class="step">
+                        <div class="step__icon">🔒</div>
+                        <div class="step__number">4</div>
+                        <h3 class="step__title">Private</h3>
+                        <p class="step__desc">Everything runs in your browser — no data leaves your device</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Classification Categories (full width) -->
+            <section class="card full-width" id="categories-section">
+                <h2 class="card__title">
+                    <span class="card__title-icon">🏷️</span>
+                    Tumor Categories
+                </h2>
+                <div class="categories">
+                    <div class="category category--glioma">
+                        <div class="category__icon">🔴</div>
+                        <div class="category__name">Glioma</div>
+                    </div>
+                    <div class="category category--meningioma">
+                        <div class="category__icon">🟠</div>
+                        <div class="category__name">Meningioma</div>
+                    </div>
+                    <div class="category category--pituitary">
+                        <div class="category__icon">🟣</div>
+                        <div class="category__name">Pituitary</div>
+                    </div>
+                    <div class="category category--notumor">
+                        <div class="category__icon">🟢</div>
+                        <div class="category__name">No Tumor</div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Model Status Bar -->
+        <div class="status-bar" id="status-bar">
+            <span class="status-bar__dot" id="status-dot"></span>
+            <span id="status-text">Initializing model...</span>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p class="footer__text">
+                Built with TensorFlow.js &amp; MobileNetV2<br>
+                &copy; 2026 NeuroScan AI
+            </p>
+            <div class="footer__disclaimer">
+                <strong>⚠️ Disclaimer:</strong> This tool is for educational and research purposes only. 
+                It is NOT a medical diagnostic tool. Always consult a qualified healthcare professional 
+                for medical advice and diagnosis.
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- App Script -->
+    <script src="app.js"></script>
+</body>
+</html>
