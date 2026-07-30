@@ -18,5 +18,5 @@ COPY --chown=user . /app
 # Expose port 7860 (Hugging Face Spaces default for Docker)
 EXPOSE 7860
 
-# Run the FastAPI server
-CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "7860"]
+# Run the FastAPI server using the PORT environment variable (Render sets this automatically)
+CMD uvicorn server:app --host 0.0.0.0 --port ${PORT:-7860}
